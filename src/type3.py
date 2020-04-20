@@ -29,11 +29,6 @@ class State:
         return str(self.name)
 
 
-class Transition:
-    def __init__(self):
-        pass
-
-
 class DFA(Automata):
 
     def __init__(self, Q: Set[State], Sigma: Set[str], delta: Callable[[State, str], State], q_0: State,
@@ -63,10 +58,15 @@ class DFA(Automata):
                     return False
         return True
 
+    def decide(self, word: str) -> bool:
+        run = self.q_0
+        for char in word:
+            run = self.delta(run, char)
+        return run in self.F
+
     def get_graph(self) -> MultiDiGraph:
         g: MultiDiGraph = MultiDiGraph()
         g.add_nodes_from(map(lambda x: str(x), self.Q))
-
         return g
 
 
@@ -106,6 +106,6 @@ def load_dfa_from_json(file: str) -> DFA:
     q_0: Optional[State] = set(
         map(State, [state for state, values in dfa_obj.items() if 'starting_state' in values.keys()])).pop()
     delta: Callable[[State, str], State] = lambda state, entry: State(
-        dfa_obj.get(str(state), {'transitions': {}})['transitions'].get(entry, None))
+        dfa_obj.get(str(state), {'transitions': {}})['transitions'].get(entry, None)) if state is not None else None
 
     return DFA(Q, Sigma, delta, q_0, F)
