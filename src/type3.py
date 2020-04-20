@@ -1,7 +1,8 @@
 from typing import Set, Optional, Callable
 # from itertools.chain import from_iterable
 
-from networkx import MultiDiGraph
+from networkx import MultiDiGraph, draw, spring_layout
+from networkx.drawing.nx_agraph import to_agraph
 
 from utils.file_tools import load_json
 
@@ -64,10 +65,40 @@ class DFA(Automata):
             run = self.delta(run, char)
         return run in self.F
 
+    def __neg__(self):
+        return self.complement()
+
+    def complement(self):
+        return DFA(self.Q, self.Sigma, self.delta, self.q_0, self.Q - self.F)
+
+    def product(self, other, mode='intersection'):
+        # TODO
+        pass
+
+    def __mul__(self, other):
+        return self.product(other)
+
+    def __rmul__(self, other):
+        return self.product(other)
+
+    def __imul__(self, other):
+        return self.product(other)
+
     def get_graph(self) -> MultiDiGraph:
+        #TODO: check how to visualize network
         g: MultiDiGraph = MultiDiGraph()
-        g.add_nodes_from(map(lambda x: str(x), self.Q))
-        return g
+        g.add_nodes_from(map(str, self.Q))
+        for state in self.Q:
+            for entry in self.Sigma:
+                g.add_edge(str(state), str(self.delta(state, entry)))
+        # plt.figure()
+        # draw(g, spring_layout(g), connectionstyle='arc3, rad = 0.1')
+        A = to_agraph(g)
+        A.layout('dot')
+        A.draw()
+        # plt.axis('off')
+        # plt.show()
+        return A
 
 
 class PartialDFA(DFA):
@@ -105,7 +136,7 @@ def load_dfa_from_json(file: str) -> DFA:
     F: Set[State] = set(map(State, [state for state, values in dfa_obj.items() if values['final_state']]))
     q_0: Optional[State] = set(
         map(State, [state for state, values in dfa_obj.items() if 'starting_state' in values.keys()])).pop()
-    delta: Callable[[State, str], State] = lambda state, entry: State(
+    delta: Callable[[State, str], Optional[State]] = lambda state, entry: State(
         dfa_obj.get(str(state), {'transitions': {}})['transitions'].get(entry, None)) if state is not None else None
 
     return DFA(Q, Sigma, delta, q_0, F)
