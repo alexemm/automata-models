@@ -1,5 +1,6 @@
 {
   "0": {
+    "starting_state": true,
     "final_state": false,
     "transitions": {
       "a": "0",
