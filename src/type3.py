@@ -2,9 +2,9 @@ from typing import Set, Optional, Callable
 # from itertools.chain import from_iterable
 
 from networkx import MultiDiGraph, draw, spring_layout
-from networkx.drawing.nx_agraph import to_agraph
+# from networkx.drawing.nx_agraph import to_agraph
 
-from utils.file_tools import load_json
+from utils.file_tools import load_json, save_json
 
 import matplotlib.pyplot as plt
 import itertools as it
@@ -72,8 +72,23 @@ class DFA(Automata):
         return DFA(self.Q, self.Sigma, self.delta, self.q_0, self.Q - self.F)
 
     def product(self, other, mode='intersection'):
-        # TODO
-        pass
+        new_states = [(state1, state2) for state1, state2 in it.product(self.Q, other.Q)]
+        state_name = lambda state1, state2: "(%s, %s)" % (str(state1), str(state2))
+        delta_dict = {state_name(state1, state2): {'transitions': {}} for state1, state2 in new_states}
+        for state1, state2 in new_states:
+            if state1 == self.q_0 and state2 == other.q_0:
+                delta_dict[str(State(state_name(state1, state2)))]['starting_state'] = True
+            if mode == 'intersection':
+                delta_dict[str(State(state_name(state1, state2)))][
+                    'final_state'] = state1 in self.F and state2 in other.F
+            else:
+                delta_dict[str(State(state_name(state1, state2)))][
+                    'final_state'] = state1 in self.F or state2 in other.F
+            for entry in self.Sigma:
+                delta_dict[str(State(state_name(state1, state2)))]['transitions'][entry] = str(
+                    State(state_name(self.delta(state1, entry), other.delta(state2, entry))))
+        # save_json('data/dfa3.json', delta_dict)
+        return load_dfa_from_dict(delta_dict)
 
     def __mul__(self, other):
         return self.product(other)
@@ -85,20 +100,21 @@ class DFA(Automata):
         return self.product(other)
 
     def get_graph(self) -> MultiDiGraph:
-        #TODO: check how to visualize network
+        # TODO: check how to visualize network
         g: MultiDiGraph = MultiDiGraph()
         g.add_nodes_from(map(str, self.Q))
         for state in self.Q:
             for entry in self.Sigma:
                 g.add_edge(str(state), str(self.delta(state, entry)))
-        # plt.figure()
-        # draw(g, spring_layout(g), connectionstyle='arc3, rad = 0.1')
-        A = to_agraph(g)
-        A.layout('dot')
-        A.draw()
-        # plt.axis('off')
-        # plt.show()
-        return A
+        # # plt.figure()
+        # # draw(g, spring_layout(g), connectionstyle='arc3, rad = 0.1')
+        # A = to_agraph(g)
+        # A.layout('dot')
+        # A.draw()
+        # # plt.axis('off')
+        # # plt.show()
+        return g
+        # return A
 
 
 class PartialDFA(DFA):
@@ -129,8 +145,7 @@ class PartialDFA(DFA):
         return True
 
 
-def load_dfa_from_json(file: str) -> DFA:
-    dfa_obj = load_json(file)
+def load_dfa_from_dict(dfa_obj) -> DFA:
     Q: Set[State] = set(map(State, dfa_obj.keys()))
     Sigma: Set[str] = set(it.chain.from_iterable([state['transitions'].keys() for _, state in dfa_obj.items()]))
     F: Set[State] = set(map(State, [state for state, values in dfa_obj.items() if values['final_state']]))
@@ -140,3 +155,8 @@ def load_dfa_from_json(file: str) -> DFA:
         dfa_obj.get(str(state), {'transitions': {}})['transitions'].get(entry, None)) if state is not None else None
 
     return DFA(Q, Sigma, delta, q_0, F)
+
+
+def load_dfa_from_json(file: str) -> DFA:
+    dfa_obj = load_json(file)
+    return load_dfa_from_dict(dfa_obj)
