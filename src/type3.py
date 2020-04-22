@@ -1,8 +1,7 @@
 from typing import Set, Optional, Callable
-# from itertools.chain import from_iterable
 
 from networkx import MultiDiGraph, draw, spring_layout
-# from networkx.drawing.nx_agraph import to_agraph
+from networkx.drawing.nx_agraph import to_agraph
 
 from utils.file_tools import load_json, save_json
 
@@ -99,22 +98,30 @@ class DFA(Automata):
     def __imul__(self, other):
         return self.product(other)
 
-    def get_graph(self) -> MultiDiGraph:
-        # TODO: check how to visualize network
+    def get_graph(self):
         g: MultiDiGraph = MultiDiGraph()
+        for node in self.Q:
+            color = 'black'
+            if node in self.F:
+                color = 'red'
+            g.add_node(str(node), color=color)
         g.add_nodes_from(map(str, self.Q))
         for state in self.Q:
-            for entry in self.Sigma:
-                g.add_edge(str(state), str(self.delta(state, entry)))
-        # # plt.figure()
-        # # draw(g, spring_layout(g), connectionstyle='arc3, rad = 0.1')
-        # A = to_agraph(g)
-        # A.layout('dot')
-        # A.draw()
-        # # plt.axis('off')
-        # # plt.show()
-        return g
-        # return A
+            next_states = set([self.delta(state, entry) for entry in self.Sigma])
+            next_states_transitions = [
+                (next_state, ', '.join([entry for entry in self.Sigma if self.delta(state, entry) == next_state])) for next_state in
+                next_states]
+            for next_state, entry in next_states_transitions:
+                g.add_edge(state, next_state, label=entry)
+        plt.figure()
+        g.graph['edge'] = {'arrowsize': '0.6', 'splines': 'curved'}
+        g.graph['graph'] = {'scale': '3'}
+        A = to_agraph(g)
+        A.layout('dot')
+        return A
+
+    def save_graph(self, file: str):
+        self.get_graph().draw(file)
 
 
 class PartialDFA(DFA):
