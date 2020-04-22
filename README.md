@@ -1,2 +1,2 @@
-# automata-models
+# Automaton Models
 Implementation of automaton models
