@@ -1,8 +1,9 @@
 from typing import Set, Optional, Callable
 
 from networkx import MultiDiGraph, draw, spring_layout
-from networkx.drawing.nx_agraph import to_agraph
+# from networkx.drawing.nx_agraph import to_agraph
 
+from automata import State
 from utils.file_tools import load_json, save_json
 
 import matplotlib.pyplot as plt
@@ -11,22 +12,6 @@ import itertools as it
 
 class Automata:
     pass
-
-
-class State:
-    def __init__(self, name: str = None):
-        self.name: str = name
-
-    def __eq__(self, other) -> bool:
-        if not isinstance(other, type(self)):
-            return NotImplemented
-        return str(self) == str(other)
-
-    def __hash__(self) -> int:
-        return hash(self.name)
-
-    def __str__(self) -> str:
-        return str(self.name)
 
 
 class DFA(Automata):
