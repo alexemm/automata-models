@@ -44,8 +44,8 @@ class NFA(Generic[S, A]):
         This simulates the NFA with given word and state and calculates delta^hat(q, w).
         :param q: Starting state
         :param w: Word which is simulated
-        :param rek: Uses the simple recursive way (Can cause MemoryError if w is too long)
-        :return: All the states which are given in a set
+        :param rek: Uses the simple recursive way (Can cause MemoryError if w is too long). Therefore False by default
+        :return: All the states which are the output of the simulation in a set
         """
         if rek:
             ret: Set[S] = set()
@@ -54,13 +54,11 @@ class NFA(Generic[S, A]):
         else:
             ret: Set[S] = {q}
             for symbol in w:
-                if len(ret) == 0:
-                    return ret
                 # Get all next states and assign it to ret
-                union: Set[S] = set()
+                H: Set[S] = set()
                 for state in ret:
-                    union: Set[S] = self.transitions[state].get(symbol, set()).union(union)
-                ret: Set[S] = union
+                    H: Set[S] = self.transitions[state].get(symbol, set()).union(H)
+                ret: Set[S] = H
             return ret
 
     def simulate_rek(self, q: S, w: List[A], ret: Set[S]) -> None:

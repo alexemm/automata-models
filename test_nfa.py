@@ -1,18 +1,13 @@
-from typing import Set, List, Hashable, TypeVar, Tuple
+from typing import Set, List, Tuple
 from timeit import default_timer as timer
 
 from nfa import NFA
 from file_tools import load_transitions, load_words
 
 
-# Everything which can be stored in a set
-A: TypeVar = TypeVar('A', bound=Hashable)
-S: TypeVar = TypeVar('S', bound=Hashable)
-
-
 def test_nfa_1() -> None:
     """
-    Test Case 1 is executed here. I covers the example case which was not mandatory.
+    Test Case 1 is executed here. It covers the example case which was not mandatory.
     :return: None
     """
     print("Test Case 1 started ---")
@@ -46,7 +41,7 @@ def test_nfa_1() -> None:
 def test_nfa_23() -> None:
     """
     Test cases from the homework
-    :return:
+    :return: None
     """
     transition_file: str = '2020_H09.trans'
     words_file: str = '2020_H09_input'
