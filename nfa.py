@@ -12,7 +12,7 @@ class NFA(Generic[S, A]):
 
     def __init__(self, Q: Set[S]):
         self.Q: Set[S] = Q  # Set of states
-        self.transitions: Dict[S, Dict[A, Set[A]]] = {state: {} for state in self.Q}
+        self.transitions: Dict[S, Dict[A, Set[S]]] = {state: {} for state in self.Q}
 
     def add_transition(self, q: S, a: A, p: S) -> None:
         """
@@ -23,7 +23,9 @@ class NFA(Generic[S, A]):
         :return: None
         """
         if q not in self.transitions.keys():
-            raise Exception
+            self.transitions[q]: Dict[A, Set[S]] = {}
+        if p not in self.transitions.keys():
+            self.transitions[p]: Dict[A, Set[S]] = {}
         self.transitions[q][a]: Set[S] = self.transitions[q].get(a, set()).union({p})
 
     def addTransition(self, q: S, a: A, p: S) -> None:
