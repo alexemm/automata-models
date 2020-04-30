@@ -1,3 +1,4 @@
+# Note: Type hints (typing lib) are introduced in Python 3.5, therefore use that version or newer
 from typing import Set, Generic, TypeVar, Dict, List, Hashable
 
 # Everything which can be stored in a set
@@ -19,7 +20,7 @@ class NFA(Generic[S, A]):
         Adds transition in NFA. This is done inplace.
         :param q: Initial State
         :param a: Transition symbol
-        :param p: State where the transitions goes to
+        :param p: State where the transitions go to
         :return: None
         """
         if q not in self.transitions.keys():
@@ -34,47 +35,22 @@ class NFA(Generic[S, A]):
         tho). It just calls the add_transition method
         :param q: Initial State
         :param a: Transition symbol
-        :param p: State where the transitions goes to
+        :param p: State where the transitions go to
         :return: None
         """
         self.add_transition(q, a, p)
 
-    def simulate(self, q: S, w: List[A], rek: bool = False) -> Set[S]:
+    def simulate(self, q: S, w: List[A]) -> Set[S]:
         """
         This simulates the NFA with given word and state and calculates delta^hat(q, w).
         :param q: Starting state
         :param w: Word which is simulated
-        :param rek: Uses the simple recursive way (Can cause MemoryError if w is too long). Therefore False by default
         :return: All the states which are the output of the simulation in a set
         """
-        if rek:
-            ret: Set[S] = set()
-            self.simulate_rek(q, w, ret)
-            return ret
-        else:
-            ret: Set[S] = {q}
-            for symbol in w:
-                # Get all next states and assign it to ret
-                H: Set[S] = set()
-                for state in ret:
-                    H: Set[S] = self.transitions[state].get(symbol, set()).union(H)
-                ret: Set[S] = H
-            return ret
-
-    def simulate_rek(self, q: S, w: List[A], ret: Set[S]) -> None:
-        """
-        Helper method for simulation of NFA using Dynamic Programming.
-        :param q: Starting state
-        :param w: Word which is simulates
-        :param ret: Dynamic set for return in main method
-        :return: None
-        """
-        # To make it more efficient, since recursion is limited (All states are reached, that's it)
-        if ret == self.Q:
-            return
-        # Termination condition
-        if len(w) == 0:
-            ret.add(q)
-            return
-        for next_state in self.transitions[q].get(w[0], []):
-            self.simulate_rek(next_state, w[1:], ret)
+        run: Set[S] = {q}
+        for symbol in w:
+            if run == set():
+                return run
+            # Get all next states and update ret (List comps are more performing than for-loops (and pythonic))
+            run: Set[S] = set().union(*[self.transitions[state_set].get(symbol, set()) for state_set in run])
+        return run
