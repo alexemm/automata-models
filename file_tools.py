@@ -1,3 +1,4 @@
+# Note: Type hints (typing lib) are introduced in Python 3.5, therefore use this version or newer (Tested with 3.7)
 from typing import List, Tuple
 
 

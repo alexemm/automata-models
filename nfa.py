@@ -1,4 +1,4 @@
-# Note: Type hints (typing lib) are introduced in Python 3.5, therefore use that version or newer
+# Note: Type hints (typing lib) are introduced in Python 3.5, therefore use that version or newer (Tested with 3.7)
 from typing import Set, Generic, TypeVar, Dict, List, Hashable
 
 # Everything which can be stored in a set
