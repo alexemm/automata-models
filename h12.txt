@@ -1,0 +1,314 @@
+H12
+a)
+
+Wir haben uns fuer die Einfachheit fuer egrep von der Kategorie 1 und und fuer Python von der Kategorie entschieden.
+Im Experiment haben wir die Messwerte erhalten, die unten angehangen sind.
+
+Die Messwerte sind unten angegeben (dies wurde in einer lokalen Virtuellen Maschine mit viel zu wenig Power
+auf Linux ausgefuehrt, ein Vergleich ist dennoch gueltig, da beides in dieser Umgebung gemessen wurde):
+Fuer egrep haben wir eine "erfreuliche" Laufzeit im Millisekundenbereich erhalten.
+Fuer Python haben wir mit der selben Aufgabe eine Laufzeit vom Millisekundenbereich bis zu 10 Minuten fuer
+den Fall n=20 gemessen.
+
+b)
+
+Die massiven Unterschiede in der Laufzeit haben uns sehr ueberrascht, da wir auf eine sehr kurze Regex getestet
+haben.
+Die Vermutung liegt nahe, dass eine sehr in der egrep-Implementation eine effiziente Heuristik verwendet wurde, die
+DFAs auf das absolute Minimum reduzieren, und eventuell auch auf Expertensystembasis laufen.
+Fuer Python koennte man erklaeren, dass beim Code im Speziellen eher weniger auf Effizienz Wert gelegt wird, als
+mehr auf Lesbarkeit und pythonic Code. Vermutlich koennte der Laufzeitunterschied daher kommen, dass Backtracking
+verwendet wurde, anstatt der Loesung mit den Automaten, mit einer sehr hoeheren Laufzeit in bestimmten Faellen.
+Es gibt (mindestens) drei Entwuerfe, die aus der Recherche hervorgingen:
+1. NFA -> DFA
+2. NFA simulieren, DFA Zustaende werden geladen und anschliessend im naechsten Schritt verworfen. Exponentielle
+Laufzeit wird so vermieden
+3. Backtracking, unsere Vermutung, genannt "NFA", mit einer exponentiellen Worst-Case Laufzeit und einer
+naiven Heuristik.
+"This behavior can cause a security problem called Regular expression Denial of Service"
+Mithilfe von Regex ist man in der Lage, Systeme lahmzulegen, da durch Alternierung und ungebundene Quantifizierung
+eine exponentielle Laufzeit erreicht wird, die durch einen grossen Eingabestring das System ueber eine sehr lange
+Zeit rechnen laesst.
+Dies ist beispielsweise in Web Apps moeglich, da vom Client aus Formulare ausgefuellt, und an den Server gesendet
+werden.
+Ein Beispiel in der Realitaet ist fuer die Email-Validierung
+^([a-zA-Z0-9])(([\-.]|[_]+)?([a-zA-Z0-9]+))*(@){1}[a-z0-9]+[.]{1}(([a-z]{2,3})|([a-z]{2,3}[.]{1}[a-z]{2,3}))$
+was eine verheerende Laufzeit besitzt.
+
+c)
+
+
+Quellen:
+https://en.wikipedia.org/wiki/Regular_expression#Implementations_and_running_times - Implementations
+https://medium.com/bugbountywriteup/introduction-987fdc4c7b0 - REDOS
+https://owasp.org/www-community/attacks/Regular_expression_Denial_of_Service_-_ReDoS - Evil Regex examples
+
+
+Messwerte (Roher output):
+We start with an implementation from category 1 (egrep) -----
+regex_tests/01
+Output:
+It took
+.002703406
+seconds
+
+regex_tests/02
+Output:
+It took
+.003145281
+seconds
+
+regex_tests/03
+Output:
+It took
+.002708546
+seconds
+
+regex_tests/04
+Output:
+It took
+.002483907
+seconds
+
+regex_tests/05
+Output:
+It took
+.002530283
+seconds
+
+regex_tests/06
+Output:
+It took
+.002924228
+seconds
+
+regex_tests/07
+Output:
+It took
+.002821607
+seconds
+
+regex_tests/08
+Output:
+It took
+.005209871
+seconds
+
+regex_tests/09
+Output:
+It took
+.003311836
+seconds
+
+regex_tests/10
+Output:
+It took
+.003125515
+seconds
+
+regex_tests/11
+Output:
+It took
+.004872006
+seconds
+
+regex_tests/12
+Output:
+It took
+.008753268
+seconds
+
+regex_tests/13
+Output:
+It took
+.007826811
+seconds
+
+regex_tests/14
+Output:
+It took
+.010809191
+seconds
+
+regex_tests/15
+Output:
+It took
+.005371359
+seconds
+
+regex_tests/16
+Output:
+It took
+.007683583
+seconds
+
+regex_tests/17
+Output:
+It took
+.002587528
+seconds
+
+regex_tests/18
+Output:
+It took
+.003837456
+seconds
+
+regex_tests/19
+Output:
+It took
+.003775069
+seconds
+
+regex_tests/20
+Output:
+It took
+.002840776
+seconds
+
+Category 1 done -----
+
+We start with an implementation from category 2 (Python) -----
+04
+regex_tests/04
+[]
+It took
+0.110230
+seconds.
+
+13
+regex_tests/13
+[]
+It took
+13.021308
+seconds.
+
+16
+regex_tests/16
+[]
+It took
+71.905547
+seconds.
+
+09
+regex_tests/09
+[]
+It took
+1.001151
+seconds.
+
+11
+regex_tests/11
+[]
+It took
+3.692757
+seconds.
+
+01
+regex_tests/01
+[]
+It took
+0.005144
+seconds.
+
+10
+regex_tests/10
+[]
+It took
+1.913454
+seconds.
+
+08
+regex_tests/08
+[]
+It took
+0.517288
+seconds.
+
+19
+regex_tests/19
+[]
+It took
+346.288254
+seconds.
+
+02
+regex_tests/02
+[]
+It took
+0.011135
+seconds.
+
+06
+regex_tests/06
+[]
+It took
+0.142907
+seconds.
+
+03
+regex_tests/03
+[]
+It took
+0.018808
+seconds.
+
+14
+regex_tests/14
+[]
+It took
+23.242293
+seconds.
+
+12
+regex_tests/12
+[]
+It took
+7.124863
+seconds.
+
+07
+regex_tests/07
+[]
+It took
+0.278754
+seconds.
+
+05
+regex_tests/05
+[]
+It took
+0.085157
+seconds.
+
+20
+regex_tests/20
+[]
+It took
+570.095331
+seconds.
+
+18
+regex_tests/18
+[]
+It took
+210.687773
+seconds.
+
+17
+regex_tests/17
+[]
+It took
+124.842793
+seconds.
+
+15
+regex_tests/15
+[]
+It took
+41.598532
+seconds.
+
+Category 2 done -----
+
+Process finished with exit code 0
