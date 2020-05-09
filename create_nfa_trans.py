@@ -1,10 +1,14 @@
 from typing import List, Iterator
 
 
+def get_alphanumericals_and_comma():
+    for i in range(128):
+        if chr(i).isalnum() or chr(i) == ',':
+            yield chr(i)
+
+
 def get_self_loops(i: int) -> List[str]:
-    # Get all the single byte chars
-    print(i)
-    return ["%i %s %i" % (i, chr(lo), i) for lo in range(256) if chr(lo) != '\n']
+    return ["%i %s %i" % (i, lo, i) for lo in get_alphanumericals_and_comma()]
 
 
 def get_all_self_loops(n: int = 13) -> List[str]:
