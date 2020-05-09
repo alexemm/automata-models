@@ -1,13 +1,18 @@
+Inhalt:
+- H12
+- Methodologie
+- Messwerte
+
 H12
 a)
 
 Wir haben uns fuer die Einfachheit fuer egrep von der Kategorie 1 und und fuer Python von der Kategorie entschieden.
 Im Experiment haben wir die Messwerte erhalten, die unten angehangen sind.
 
-Die Messwerte sind unten angegeben (dies wurde in einer lokalen Virtuellen Maschine mit viel zu wenig Power
+Die Messwerte sind unten (am Ende) angegeben (dies wurde in einer lokalen Virtuellen Maschine mit viel zu wenig Power
 auf Linux ausgefuehrt, ein Vergleich ist dennoch gueltig, da beides in dieser Umgebung gemessen wurde):
 Fuer egrep haben wir eine "erfreuliche" Laufzeit im Millisekundenbereich erhalten.
-Fuer Python haben wir mit der selben Aufgabe eine Laufzeit vom Millisekundenbereich bis zu 10 Minuten fuer
+Fuer Python haben wir mit der selben Aufgabe eine Laufzeit vom Millisekundenbereich bis zu fast 3 Minuten fuer
 den Fall n=20 gemessen.
 
 b)
@@ -35,280 +40,425 @@ Ein Beispiel in der Realitaet ist fuer die Email-Validierung
 ^([a-zA-Z0-9])(([\-.]|[_]+)?([a-zA-Z0-9]+))*(@){1}[a-z0-9]+[.]{1}(([a-z]{2,3})|([a-z]{2,3}[.]{1}[a-z]{2,3}))$
 was eine verheerende Laufzeit besitzt.
 
-c)
-
-
 Quellen:
 https://en.wikipedia.org/wiki/Regular_expression#Implementations_and_running_times - Implementations
 https://medium.com/bugbountywriteup/introduction-987fdc4c7b0 - REDOS
 https://owasp.org/www-community/attacks/Regular_expression_Denial_of_Service_-_ReDoS - Evil Regex examples
 
+c)
+
+Im Vergleich zu den Ergebnissen von vorher, war die Performance von unser Implementation der NFA um eine Nachkomma-
+stelle im Millisekundenbereich besser als die Ergebnisse von Kategorie 1. Mit der Erstellung der NFA fuer die Regex.
+die am Anfang des Programms durchgefuehrt wurde, brauchen wir bis zu ca. 2 Milisekunden fuer jede Regex, wobei die
+kuerzeste gemessene Zeit, bei der Kategorie 1, 4 Milisekunden war.
+Damit ist unsere Implementation fuer diese Regex knapp die effizienteste.
+Was der Unterschied zu den anderen Implementierungen ist, ist die Tatsache, dass die NFA fuer die Regular Expression
+"hardcoded" ist. Damit wurde ein Schritt der Automatisierung genommen: das Erstellen der NFA aus der Regular Expression.
+Ausserdem gehen wir von alphanumerischen Zeichen und dem Komma aus, was bei der gegebenen Regex '(\W|,)' waere.
+Der Vergleich ist also nicht ganz fair, da von Hand eine effiziente Implementation erstellt wurde, die besser ist,
+als die vorhandene Implementation bei der Kategorie 1.
+
+
+
+Methodologie:
+
+Dieser Kapitel wird genutzt, um die genutzten Skripte und Dateien zu erklaeren:
+- main.py: Die Tests von unserer NFA Implementation, erweitert um die Tests von H12 (Teilaufgabe c)
+- nfa.py: Unsere NFA Implementation von letzter Woche (Teilaufgabe c)
+- file_tools.py: Funktionen zum Laden der NFAs und Testdateien
+- category1.sh: Die Tests zu den Implementationen von Kategorie 1 (egrep) fuer die Messwerte
+- category2.py: Die Tests zu den Implementationen von Kategorie 2 (Python3 re - lib) fuer die Messwerte
+- regex.txt: Die Regex von der Aufgabenstellung, die geladen wird
+- create_regex_test.py: Skript zur Erstellung der Regex test cases
+- regex_test: Ordner mit allen Regex test cases (Ergebnis von create_regex_test)
+- create_nfa_trans.py: Skript zur Erstellung der Transitionen des NFAs fuer die Regex der Aufgabenstellung
+- 2020_H12.trans: Das Ergebnis von create_nfa_trans
+
+
 
 Messwerte (Roher output):
+
+
+Category 1:
+
+
 We start with an implementation from category 1 (egrep) -----
 regex_tests/01
 Output:
 It took
-.002703406
+.004999954
 seconds
 
 regex_tests/02
 Output:
 It took
-.003145281
+.006132939
 seconds
 
 regex_tests/03
 Output:
 It took
-.002708546
+.005467131
 seconds
 
 regex_tests/04
 Output:
 It took
-.002483907
+.005904973
 seconds
 
 regex_tests/05
 Output:
 It took
-.002530283
+.005756768
 seconds
 
 regex_tests/06
 Output:
 It took
-.002924228
+.005209273
 seconds
 
 regex_tests/07
 Output:
 It took
-.002821607
+.005254670
 seconds
 
 regex_tests/08
 Output:
 It took
-.005209871
+.005946250
 seconds
 
 regex_tests/09
 Output:
 It took
-.003311836
+.005160872
 seconds
 
 regex_tests/10
 Output:
 It took
-.003125515
+.005834643
 seconds
 
 regex_tests/11
 Output:
 It took
-.004872006
+.005003167
 seconds
 
 regex_tests/12
 Output:
 It took
-.008753268
+.004491013
 seconds
 
 regex_tests/13
 Output:
 It took
-.007826811
+.005572872
 seconds
 
 regex_tests/14
 Output:
 It took
-.010809191
+.005139919
 seconds
 
 regex_tests/15
 Output:
 It took
-.005371359
+.004911115
 seconds
 
 regex_tests/16
 Output:
 It took
-.007683583
+.004604227
 seconds
 
 regex_tests/17
 Output:
 It took
-.002587528
+.005031663
 seconds
 
 regex_tests/18
 Output:
 It took
-.003837456
+.005522516
 seconds
 
 regex_tests/19
 Output:
 It took
-.003775069
+.004994367
 seconds
 
 regex_tests/20
 Output:
 It took
-.002840776
+.006186230
 seconds
 
 Category 1 done -----
 
+
+Category 2:
+
+
 We start with an implementation from category 2 (Python) -----
-04
-regex_tests/04
+03
+regex_tests/03
 []
 It took
-0.110230
-seconds.
-
-13
-regex_tests/13
-[]
-It took
-13.021308
-seconds.
-
-16
-regex_tests/16
-[]
-It took
-71.905547
-seconds.
-
-09
-regex_tests/09
-[]
-It took
-1.001151
-seconds.
-
-11
-regex_tests/11
-[]
-It took
-3.692757
-seconds.
-
-01
-regex_tests/01
-[]
-It took
-0.005144
-seconds.
-
-10
-regex_tests/10
-[]
-It took
-1.913454
-seconds.
-
-08
-regex_tests/08
-[]
-It took
-0.517288
-seconds.
-
-19
-regex_tests/19
-[]
-It took
-346.288254
-seconds.
-
-02
-regex_tests/02
-[]
-It took
-0.011135
+0.008130
 seconds.
 
 06
 regex_tests/06
 []
 It took
-0.142907
+0.059947
 seconds.
 
-03
-regex_tests/03
+04
+regex_tests/04
 []
 It took
-0.018808
-seconds.
-
-14
-regex_tests/14
-[]
-It took
-23.242293
-seconds.
-
-12
-regex_tests/12
-[]
-It took
-7.124863
-seconds.
-
-07
-regex_tests/07
-[]
-It took
-0.278754
-seconds.
-
-05
-regex_tests/05
-[]
-It took
-0.085157
-seconds.
-
-20
-regex_tests/20
-[]
-It took
-570.095331
-seconds.
-
-18
-regex_tests/18
-[]
-It took
-210.687773
-seconds.
-
-17
-regex_tests/17
-[]
-It took
-124.842793
+0.015528
 seconds.
 
 15
 regex_tests/15
 []
 It took
-41.598532
+14.920896
+seconds.
+
+14
+regex_tests/14
+[]
+It took
+5.904424
+seconds.
+
+19
+regex_tests/19
+[]
+It took
+85.375130
+seconds.
+
+01
+regex_tests/01
+[]
+It took
+0.001422
+seconds.
+
+05
+regex_tests/05
+[]
+It took
+0.018213
+seconds.
+
+08
+regex_tests/08
+[]
+It took
+0.139559
+seconds.
+
+13
+regex_tests/13
+[]
+It took
+3.284173
+seconds.
+
+18
+regex_tests/18
+[]
+It took
+68.415788
+seconds.
+
+17
+regex_tests/17
+[]
+It took
+30.841814
+seconds.
+
+07
+regex_tests/07
+[]
+It took
+0.072953
+seconds.
+
+11
+regex_tests/11
+[]
+It took
+0.967372
+seconds.
+
+09
+regex_tests/09
+[]
+It took
+0.274263
+seconds.
+
+10
+regex_tests/10
+[]
+It took
+0.521652
+seconds.
+
+16
+regex_tests/16
+[]
+It took
+18.151469
+seconds.
+
+20
+regex_tests/20
+[]
+It took
+154.958448
+seconds.
+
+12
+regex_tests/12
+[]
+It took
+1.784118
+seconds.
+
+02
+regex_tests/02
+[]
+It took
+0.002676
 seconds.
 
 Category 2 done -----
 
-Process finished with exit code 0
+
+Category 3:
+
+
+Creating NFA
+Transition addition runtime: Start
+Finished. It took 0.001096 seconds.
+
+Start testing simulation of words from directory---
+03
+NFA simulation started for case 0 with length of 32
+Finished. It took 0.000145 seconds.
+The resulting set is:
+{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}
+06
+NFA simulation started for case 1 with length of 38
+Finished. It took 0.000158 seconds.
+The resulting set is:
+{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}
+04
+NFA simulation started for case 2 with length of 34
+Finished. It took 0.000142 seconds.
+The resulting set is:
+{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}
+15
+NFA simulation started for case 3 with length of 56
+Finished. It took 0.000252 seconds.
+The resulting set is:
+{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}
+14
+NFA simulation started for case 4 with length of 54
+Finished. It took 0.000244 seconds.
+The resulting set is:
+{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}
+19
+NFA simulation started for case 5 with length of 64
+Finished. It took 0.000298 seconds.
+The resulting set is:
+{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}
+01
+NFA simulation started for case 6 with length of 28
+Finished. It took 0.000104 seconds.
+The resulting set is:
+{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}
+05
+NFA simulation started for case 7 with length of 36
+Finished. It took 0.000216 seconds.
+The resulting set is:
+{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}
+08
+NFA simulation started for case 8 with length of 42
+Finished. It took 0.000156 seconds.
+The resulting set is:
+{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}
+13
+NFA simulation started for case 9 with length of 52
+Finished. It took 0.000200 seconds.
+The resulting set is:
+{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}
+18
+NFA simulation started for case 10 with length of 62
+Finished. It took 0.000244 seconds.
+The resulting set is:
+{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}
+17
+NFA simulation started for case 11 with length of 60
+Finished. It took 0.000236 seconds.
+The resulting set is:
+{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}
+07
+NFA simulation started for case 12 with length of 40
+Finished. It took 0.000196 seconds.
+The resulting set is:
+{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}
+11
+NFA simulation started for case 13 with length of 48
+Finished. It took 0.000182 seconds.
+The resulting set is:
+{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}
+09
+NFA simulation started for case 14 with length of 44
+Finished. It took 0.000163 seconds.
+The resulting set is:
+{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}
+10
+NFA simulation started for case 15 with length of 46
+Finished. It took 0.000174 seconds.
+The resulting set is:
+{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}
+16
+NFA simulation started for case 16 with length of 58
+Finished. It took 0.000226 seconds.
+The resulting set is:
+{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}
+20
+NFA simulation started for case 17 with length of 66
+Finished. It took 0.000263 seconds.
+The resulting set is:
+{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}
+12
+NFA simulation started for case 18 with length of 50
+Finished. It took 0.000191 seconds.
+The resulting set is:
+{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}
+02
+NFA simulation started for case 19 with length of 30
+Finished. It took 0.000099 seconds.
+The resulting set is:
+{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}
+Finished testing simulation ---
