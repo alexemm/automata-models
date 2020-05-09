@@ -1,4 +1,5 @@
 # Note: Type hints (typing lib) are introduced in Python 3.5, therefore use this version or newer (Tested with 3.7)
+import os
 from typing import Set, List, Tuple, TypeVar, Hashable
 from timeit import default_timer as timer
 
@@ -102,9 +103,27 @@ def test_nfa_3(nfa: NFA[S, A]) -> None:
     print("Finished testing simulation ---")
 
 
-if __name__ == '__main__':
+def test_h09() -> None:
     transition_file: str = '2020_H09.trans'
-    nfa = load_and_create_nfa(transition_file)
+    nfa: NFA[int, str] = load_and_create_nfa(transition_file)
     # test_nfa_1()
     test_nfa_2(nfa)
     test_nfa_3(nfa)
+
+
+def test_h12():
+    transition_file: str = '2020_H12.trans'
+    dire: str = 'regex_tests/'
+    start_zustand: int = 0
+    nfa: NFA[int, str] = load_and_create_nfa(transition_file)
+    print("Start testing simulation of words from directory---")
+    for i, file in enumerate(os.listdir(dire)):
+        eingabe: List[str] = list(load_words(dire + file)[0])
+        print(file)
+        do_simulation(nfa, start_zustand, eingabe, i)
+    print("Finished testing simulation ---")
+
+
+if __name__ == '__main__':
+    #test_h09()
+    test_h12()

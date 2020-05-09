@@ -3,7 +3,8 @@ from typing import List, Iterator
 
 def get_self_loops(i: int) -> List[str]:
     # Get all the single byte chars
-    return ["%i %s %i" % (i, chr(lo), i) for lo in range(256) if chr(i) != '\n']
+    print(i)
+    return ["%i %s %i" % (i, chr(lo), i) for lo in range(256) if chr(lo) != '\n']
 
 
 def get_all_self_loops(n: int = 13) -> List[str]:
